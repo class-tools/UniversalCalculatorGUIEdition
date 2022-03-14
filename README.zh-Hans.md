@@ -1,4 +1,4 @@
-# UniversalCalculatorGUIEdition
+# Universal Calculator GUI Edition
 
 一个使用 C++ 制作的强大 GUI 计算器程序。
 
