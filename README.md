@@ -1,4 +1,4 @@
-# UniversalCalculatorGUIEdition
+# Universal Calculator GUI Edition
 
 A Powerful GUI Calculator Program made by C++.
 
