@@ -3,82 +3,125 @@
 #include <cmath>
 #include <ctime>
 using namespace std;
-double b,c,h,m,hs;//b、c、d、h、m用于输入，不可调用。
-long long e,f=2,g,k[10005][10005],l,x[42][42],j,bug;
-char d;
-bool prime(long long a)//判断质数，a为被判断的数。
+string s;
+double in1,in3,in4,in5,hs;//in1、in2、in3、in4、in5用于输入，不可调用。其余变量为共享变量。
+long long e,f,g,k[10005][10005],l,x[10005][10005],j,bug;
+char in2;
+bool prime(long long p)//判断质数，p为被判断的数。
 {
-	if(a<2)
+	if(p<2)
 	{
 		return 0;
 	}
-	for(long long i=2;i<=sqrt(a);i++)
+	for(long long i=2;i<=sqrt(p);i++)
 	{
-		if(a%i==0)
+		if(p%i==0)
 		{
 			return 0;
 		}
 	}
 	return 1;
 }
-long long axy(long long a,long long b)//排列数计算，a为下角标，b为上角标。
+long long gcd(long long a,long long b)//求a和b的最大公因数。
 {
-	if(a<b||a<0||b<0)
+	if(a%b==0)
 	{
-		return -1;
+		return b;
 	}
-	long long c=1;
-	for(long long i=1;i<=b;i++)
-	{
-		c*=a;
-		a--;
-	}
-	return c;
+	return gcd(b,a%b);
 }
-long long yhsjzhqh(double a)//杨辉三角整行求和，a表示求和的是第几行。
+long long dsgcd(double n)//最大公因数，n表示求最大公因数的数的个数。
 {
-	if(a!=(int)a||a<=0)
+	if(n<2||n!=(int)n)
 	{
 		return 0;
 	}
-	return pow(2,a-1);
+	for(short i=0;i<n;i++)
+	{
+		if(k[0][i]<1)
+		{
+			return 0;
+		}
+	}
+	for(short i=1;i<n;i++)
+	{
+		if(i==1)
+		{
+			j=gcd(k[0][i-1],k[0][i]);
+			continue;
+		}
+		j=gcd(j,k[0][i]);
+	}
+	return j;
 }
-long long yhsjqx(double a,double b)//杨辉三角求项，a表示行，b表示列。
+long long dslcm(double n)//最小公倍数，n表示求最下公倍数的数的个数。
 {
-	if(a<b||a!=(int)a||b!=(int)b)
+	if(n<1||n!=(int)n)
 	{
 		return 0;
 	}
-	if(b==1||b==a)
+	for(short i=0;i<n;i++)
 	{
-		return 1;
+		if(k[0][i]<1)
+		{
+			return 0;
+		}
 	}
-	return axy(a-1,b-1)/axy(b-1,b-1);
+	for(short i=1;i<n;i++)
+	{
+		if(i==1)
+		{
+			j=k[0][i-1]/gcd(k[0][i-1],k[0][i])*k[0][i];
+			continue;
+		}
+		j=j/gcd(j,k[0][i])*k[0][i];
+	}
+	return j;
 }
-void huanfang(long long a)//奇数阶幻方，a表示幻方阶数。
+long long fbnqqx(double n)//斐波那契数列求项，n表示求的是第n项。
 {
-	if(a%2==0)
+	if(n!=(int)n||n<1)
+	{
+		return 0;
+	}
+	k[0][0]=k[0][1]=1;
+	for(long long i=2;i<n;i++)
+	{
+		k[0][i%3]=k[0][(i-1)%3]+k[0][(i-2)%3];
+	}
+	return k[0][(int)(n-1)%3];
+}
+long long yhsjzhqh(double n)//杨辉三角整行求和，n表示求和的是第n行。
+{
+	if(n!=(int)n||n<=0)
+	{
+		return 0;
+	}
+	return pow(2,n-1); 
+}
+void huanfang(long long n)//奇数阶幻方，n表示幻方阶数。
+{
+	if(n%2==0)
 	{
 		cout << "只能生成正奇数阶！" << endl;
 		return;
 	}
-	for(short i=0;i<a;i++)
+	for(short i=0;i<n;i++)
 	{
-	    for(short j=0;j<a;j++)
+	    for(short j=0;j<n;j++)
 	    {
-	        k[i][j]=0;
-	        x[i][j]=0;
+	        k[i][j]=x[i][j]=0;
 	    }
 	}
 	l=0;
-	e=a/2;
-	k[l][e]=1;
-	x[l][e]=1;
-	while(f<=pow(a,2))
+	f=2;
+	e=n/2;
+	k[l][e]=x[l][e]=1;
+	while(f<=pow(n,2))
 	{
-	    if(l-1<0||e+1>a-1)
+	    if(l-1<0||e+1>n-1)
 	    {
-	        if(l-1>=0&&e+1>a-1)
+	        if(l-1>=0&&e+1>n-1)
 	        {
 	            k[l-1][0]=f;
 	            x[l-1][0]=1;
@@ -86,18 +129,18 @@ void huanfang(long long a)//奇数阶幻方，a表示幻方阶数。
 	            e=0;
 	            f++;
 	        }
-	        else if(l-1<0&&e+1<=a-1)
+	        else if(l-1<0&&e+1<=n-1)
 	        {
-	            k[a-1][e+1]=f;
-	            x[a-1][e+1]=1;
-	            l=a-1;
+	            k[n-1][e+1]=f;
+	            x[n-1][e+1]=1;
+	            l=n-1;
 	            e++;
 	            f++;
 	        }
-	        else if(l==0&&e==a-1)
+	        else if(l==0&&e==n-1)
 	        {
-	            k[l+1][a-1]=f;
-	            x[l+1][a-1]=1;
+	            k[l+1][n-1]=f;
+	            x[l+1][n-1]=1;
 	            l++;
 	            f++;
 	        }
@@ -109,7 +152,7 @@ void huanfang(long long a)//奇数阶幻方，a表示幻方阶数。
 	        l++;
 	        f++;
 	    }
-	    else if(l-1>=0&&e+1<=a-1)
+	    else if(l-1>=0&&e+1<=n-1)
 	    {
 	        k[l-1][e+1]=f;
 	        x[l-1][e+1]=1;
@@ -118,83 +161,101 @@ void huanfang(long long a)//奇数阶幻方，a表示幻方阶数。
 	        f++;
 	    }
 	}
-	for(short i=0;i<a;i++)
+	for(short i=0;i<n;i++)
 	{
-	    for(short j=0;j<a;j++)
+	    for(short j=0;j<n;j++)
 	    {
 	        cout << k[i][j] << " ";
 	    }
 	    cout << endl;
 	}
 }
-long long gcd(long long a,long long b)//求a和b的最大公因数。
+long long axy(long long a,long long b)//排列数计算，a为下角标，b为上角标。
 {
-	if(a%b==0)
-	{
-		return b;
-	}
-	return gcd(b,a%b);
-}
-long long jttl(double a,double b,double c,double d)//鸡兔同笼，a表示头数，b表示脚数，c表示鸡脚数，d表示兔脚数。
-{
-	if(a!=(int)a||b!=(int)b||c!=(int)c||d!=(int)d||a<0||b<0||c<0||d<0)
+	if(a<b||a<0||b<0)
 	{
 		return -1;
+	} 
+	long long c=1;
+	for(long long i=1;i<=b;i++)
+	{
+		c*=a;
+		a--;
 	}
-	return (b-a*c)/d-c;
+	return c;
 }
-long long dsgcd(double a)//最大公因数，a表示求最大公因数的数的个数。
+long long yhsjqx(double x,double y)//杨辉三角求项，x表示行，y表示列。
 {
-	if(a<1||a!=(int)a)
+	if(x<y||x!=(int)x||y!=(int)y)
 	{
 		return 0;
 	}
-	for(short i=0;i<a;i++)
+	if(y==1||y==x)
 	{
-		if(k[0][i]<1)
-		{
-			return 0;
-		}
+		return 1;
 	}
-	for(short i=1;i<a;i++)
-	{
-		if(i==1)
-		{
-			j=gcd(k[0][i-1],k[0][i]);
-			continue;
-		}
-		j=gcd(j,k[0][i]);
-	}
-	return j;
+	return axy(x-1,y-1)/axy(y-1,y-1);
 }
-long long dslcm(double a)//最小公倍数，a表示求最下公倍数的数的个数。
+void jzzh(short m,string s,short n)//进制转换（整数），m表示被转换数的进制，s表示被转换的数，n表示转换后的进制。
 {
-	if(a<1||a!=(int)a)
+	g=s.size();
+	for(long long i=0;i<g;i++)
 	{
-		return 0;
-	}
-	for(short i=0;i<a;i++)
-	{
-		if(k[0][i]<1)
+		if(s[i]<='9')
 		{
-			return 0;
+			k[0][i]=s[i]-48;
+		}
+		if(s[i]>='A')
+		{
+			k[0][i]=s[i]-55;
 		}
 	}
-	for(short i=1;i<a;i++)
+	for(long long i=g-1;i>=0;i--)
 	{
-		if(i==1)
-		{
-			j=k[0][i-1]/gcd(k[0][i-1],k[0][i])*k[0][i];
-			continue;
-		}
-		j=j/gcd(j,k[0][i])*k[0][i];
+		e+=k[0][i]*pow(m,f);
+		f++;
 	}
-	return j;
+	j=0;
+	while(e!=0)
+	{
+		x[0][j]=e%n;
+		e/=n;
+		j++;
+	}
+	for(long long i=j-1;i>=0;i--)
+	{
+		if(x[0][i]<=9)
+		{
+			cout << x[0][i];
+		}
+		if(x[0][i]>=10)
+		{
+			cout << (char)(x[0][i]+55);
+		}
+	}
+	cout << endl;
 }
-void random(long long a,long long b,long long c)//随机数生成，生成c个[a,b]范围内的随机数。
+long long ksm(long long a,long long b,long long n)//乘方（快速幂），ksm(a,b,n)表示a的b次方模n。
+{
+	if(b==1)
+	{
+		return a%n;
+	}
+	if(b%2==0)
+	{
+		e=ksm(a,b/2,n);
+		return e*e%n;
+	}
+	else
+	{
+		e=ksm(a,b/2,n);
+		return e*e*a%n;
+	}
+}
+void random(long long a,long long b,long long n)//随机数生成，生成n个[a,b]范围内的随机数。
 {
 	srand(time(0));
-	for(long long i=0;i<c;i++)
+	for(long long i=0;i<n;i++)
 	{
 		cout << rand()%(b-a+1)+a << " ";
 	}
@@ -206,40 +267,45 @@ int main()
 	cout << "使用说明：" << endl;
 	cout << "每种功能具体输入内容如下所示：" << endl;
 	cout << "加法：输入加数、+和另一个加数，按Enter键输出结果。" << endl;
-	cout << "减法：被减数、-和减数，，按Enter键输出结果。" << endl;
+	cout << "减法：被减数、-和减数，按Enter键输出结果。" << endl;
 	cout << "乘法：因数、*和另一个因数，按Enter键输出结果。" << endl;
 	cout << "除法：被除数、/和除数，按Enter键输出结果。" << endl;
-	cout << "乘方：底数、d和指数，按Enter键输出结果。" << endl;
-	cout << "杨辉三角求项：行、e和列，按Enter键输出结果。" << endl;
-	cout << "排列数计算：下角标、a和上角标，按Enter键输出结果。" << endl;
-	cout << "组合数计算：下角标、c和上角标，按Enter键输出结果。" << endl;
+	cout << "乘方：底数、d和指数以及结果要模几（如果不需要取模就填1），按Enter键输出结果。" << endl;
 	cout << "开平方：被开方数和g，按Enter键输出结果。" << endl;
 	cout << "判断质数：被判断数和p，按Enter键输出结果。" << endl;
-	cout << "杨辉三角整行求和：行数和b，按Enter键输出结果。" << endl;
-	cout << "奇数阶幻方：阶数和h，按Enter键输出结果。" << endl;
+	cout << "排列数计算：下角标、a和上角标，按Enter键输出结果。" << endl;
+	cout << "组合数计算：下角标、c和上角标，按Enter键输出结果。" << endl;
 	cout << "最大公因数：数的个数、小括号（英文）和n（数的个数）个求最大公因数的数，按Enter键输出结果。" << endl;
 	cout << "最小公倍数：数的个数、中括号（英文）和n（数的个数）个求最小公倍数的数，按Enter键输出结果。" << endl;
-	cout << "鸡兔同笼：头数、f、脚数、鸡脚数和兔脚数（鸡脚数≤兔脚数），按Enter键输出结果。" << endl;
+	cout << "等差数列求末项：第一项、s、第二项和项数，按Enter键输出结果。" << endl;  
+	cout << "斐波那契数列求项：第几项和f，按Enter键输出结果。" << endl;
+	cout << "杨辉三角整行求和：行数和b，按Enter键输出结果。" << endl;
+	cout << "杨辉三角求项：行、e和列，按Enter键输出结果。" << endl;
+	cout << "鸡兔同笼：头数、j、脚数、鸡脚数和兔脚数（鸡脚数≤兔脚数），按Enter键输出结果。" << endl;
+	cout << "奇数阶幻方：阶数和h，按Enter键输出结果。" << endl;
+	cout << "进制转换（整数）：被转换数的进制（16进制及以内）、:、被转换数、转换后的进制（16进制及以内），按Enter键输出结果。" << endl;
 	cout << "随机数生成：随机数范围（一个数~另一个数，前者小于等于后者，范围包括那两个数）和生成的个数。" << endl;
 	cout << "注意事项：每输入完一个数就输入一个空格，输入完符号后换一行再输入。请尽量不要输出错误的符号，以免影响您的体验。" << endl;
 	cout << "建议在英文输入法下使用。" << endl;
 	while(1)
 	{
-		cin >> b >> d;
-		if(d!='g'&&d!='G'//开平方。
-		&&d!='p'&&d!='P'//判断质数。
-		&&d!='b'&&d!='B'//杨辉三角整行求和。
-		&&d!='h'&&d!='H'//奇数阶幻方。
-		&&d!='('&&d!=')'//最大公因数。
-		&&d!='['&&d!=']'//最小公倍数。
-		&&d!='+'&&d!='-'//加法、减法。
-		&&d!='*'&&d!='/'//乘法、除法。
-		&&d!='d'&&d!='D'//乘方。
-		&&d!='e'&&d!='E'//杨辉三角求项。
-		&&d!='f'&&d!='F'//鸡兔同笼。
-		&&d!='a'&&d!='A'//排列数计算。
-		&&d!='c'&&d!='C'//组合数计算。
-		&&d!='~')//随机数生成。
+		cin >> in1 >> in2;
+		if(in2!='+'&&in2!='-'//加法、减法。
+		&&in2!='*'&&in2!='/'//乘法、除法。
+		&&in2!='d'&&in2!='D'//乘方。
+		&&in2!='g'&&in2!='G'//开平方。
+		&&in2!='p'&&in2!='P'//判断质数。
+		&&in2!='a'&&in2!='A'//排列数计算。
+		&&in2!='c'&&in2!='C'//组合数计算。
+		&&in2!='('&&in2!=')'//最大公因数。
+		&&in2!='['&&in2!=']'//最小公倍数。
+		&&in2!='s'&&in2!='S'//等差数列求末项。
+		&&in2!='f'&&in2!='F'//斐波那契数列求项。
+		&&in2!='b'&&in2!='B'//杨辉三角整行求和。
+		&&in2!='e'&&in2!='E'//杨辉三角求项。
+		&&in2!='j'&&in2!='J'//鸡兔同笼。
+		&&in2!='h'&&in2!='H'//奇数阶幻方。
+		&&in2!=':'&&in2!='~')//进制转换（整数）、随机数生成。
 		{
 			if(bug>0)
 			{
@@ -251,25 +317,66 @@ int main()
 			continue;
 		}
 		bug=0;
-		if(d=='g'||d=='G')
+		if(in2=='g'||in2=='G')//开平方。
 		{
-			cout << sqrt(b) << endl;
+			cout << sqrt(in1) << endl;
 			continue;
 		}
-		else if(d=='p'||d=='P')
+		if(in2=='p'||in2=='P')//判断质数。
 		{
-			g=b;
-			if(prime(g)==0||b!=g)
+			g=in1;
+			if(prime(g)==0||in1!=g)
 			{
-				cout << b << "不是质数。" << endl;
+				cout << in1 << "不是质数。" << endl;
 				continue;
 			}
-			cout << b << "是质数。" << endl;
+			cout << in1 << "是质数。" << endl;
 			continue;
 		}
-		else if(d=='b'||d=='B')
+		if(in2=='('||in2==')')//最大公因数。
 		{
-			hs=yhsjzhqh(b);
+			for(short i=0;i<in1;i++)
+			{
+				cin >> k[0][i];
+			}
+			hs=dsgcd(in1);
+			if(hs==0)
+			{
+				cout << "输入错误！" << endl;
+				continue;
+			}
+			cout << hs << endl;
+			continue;
+		}
+		if(in2=='['||in2==']')//最小公倍数。
+		{
+			for(short i=0;i<in1;i++)
+			{
+				cin >> k[0][i];
+			}
+			hs=dslcm(in1);
+			if(hs==0)
+			{
+				cout << "输入错误！" << endl;
+				continue;
+			}
+			cout << hs << endl;
+			continue;
+		}
+		if(in2=='f'||in2=='F')//斐波那契数列求项。
+		{
+			hs=fbnqqx(in1);
+			if(hs==0)
+			{
+				cout << "输入错误！" << endl;
+				continue;
+			}
+			cout << hs << endl;
+			continue;
+		}
+		if(in2=='b'||in2=='B')//杨辉三角整行求和。
+		{
+			hs=yhsjzhqh(in1);
 			if(hs==0)
 			{
 				cout << "请输入正整数！" << endl;
@@ -278,86 +385,56 @@ int main()
 			cout << hs << endl;
 			continue;
 		}
-		else if(d=='h'||d=='H')
+		if(in2=='h'||in2=='H')//奇数阶幻方。
 		{
-			huanfang(b);
+			huanfang(in1);
 			continue;
 		}
-		else if(d=='('||d==')')
+		if(in2==':')//进制转换（整数）。
 		{
-			for(short i=0;i<b;i++)
-			{
-				cin >> k[0][i];
-			}
-			hs=dsgcd(b);
-			if(hs==0)
+			cin >> s >> in3;
+			if(in1!=(int)in1||in3!=(int)in3||in1<2||in3<2)
 			{
 				cout << "输入错误！" << endl;
 				continue;
 			}
-			cout << hs << endl;
-			continue;
-		}
-		else if(d=='['||d==']')
-		{
-			for(short i=0;i<b;i++)
+			if(s.find(".")==1)
 			{
-				cin >> k[0][i];
-			}
-			hs=dslcm(b);
-			if(hs==0)
-			{
-				cout << "输入错误！" << endl;
+				cout << "暂不支持小数！" << endl;
 				continue;
 			}
-			cout << hs << endl;
+			jzzh(in1,s,in3);
 			continue;
 		}
-		cin >> c;
-		if(d=='+')
+		cin >> in3;
+		if(in2=='+')//加法。
 		{
-			cout << b+c << endl;
+			cout << in1+in3 << endl;
 			continue;
 		}
-		else if(d=='-')
+		if(in2=='-')//减法。
 		{
-			cout << b-c << endl;
+			cout << in1-in3 << endl;
 			continue;
 		}
-		else if(d=='*')
+		if(in2=='*')//乘法。
 		{
-			cout << b*c << endl;
+			cout << in1*in3 << endl;
 			continue;
 		}
-		else if(d=='/')
+		if(in2=='/')//除法。
 		{
-			if(c==0)
+			if(in3==0)
 			{
 				cout << "0不能做除数！" << endl;
 				continue;
 			}
-			cout << b/c << endl;
+			cout << in1/in3 << endl;
 			continue;
 		}
-		else if(d=='d'||d=='D')
+		if(in2=='a'||in2=='A')//排列数计算。
 		{
-			cout << pow(b,c) << endl;
-			continue;
-		}
-		else if(d=='e'||d=='E')
-		{
-			hs=yhsjqx(b,c);
-			if(hs==0)
-			{
-				cout << "输入错误！" << endl;
-				continue;
-			}
-			cout << hs << endl;
-			continue;
-		}
-		else if(d=='a'||d=='A')
-		{
-			hs=axy(b,c);
+			hs=axy(in1,in3);
 			if(hs==-1)
 			{
 				cout << "输入错误！" << endl;
@@ -366,10 +443,10 @@ int main()
 			cout << hs << endl;
 			continue;
 		}
-		else if(d=='c'||d=='C')
+		if(in2=='c'||in2=='C')//组合数计算。
 		{
-			hs=axy(b,c)/axy(c,c);
-			if(axy(b,c)==-1||axy(c,c)==-1)
+			hs=axy(in1,in3)/axy(in3,in3);
+			if(axy(in1,in3)==-1||axy(in3,in3)==-1)
 			{
 				cout << "输入错误！" << endl;
 				continue;
@@ -377,28 +454,58 @@ int main()
 			cout << hs << endl;
 			continue;
 		}
-		cin >> h;
-		if(d=='~')
+		if(in2=='e'||in2=='E')//杨辉三角求项。
 		{
-			if(b!=(int)b||c!=(int)c||h!=(int)h||b<0||c<0||d<0||h<0||b>c)
+			hs=yhsjqx(in1,in3);
+			if(hs==0)
 			{
 				cout << "输入错误！" << endl;
 				continue;
 			}
-			random(b,c,h);
+			cout << hs << endl;
 			continue;
 		}
-		cin >> m;
-		if(d=='f'||d=='F')
+		cin >> in4;
+		if(in2=='d'||in2=='D')//乘方。
 		{
-			g=jttl(b,c,h,m);
-			if(g==-1)
+			if(in1!=(int)in1||in3!=(int)in3||in4!=(int)in4)
+			{
+				cout << "输入错误" << endl;
+				continue;
+			}
+			cout << ksm(in1,in3,in4) << endl;
+			continue;
+		}
+		if(in2=='s'||in2=='S')//等差数列求末项。
+		{
+			if(in1!=(int)in1||in3!=(int)in3||in4!=(int)in4||in1<0||in3<0||in4<0)
 			{
 				cout << "输入错误！" << endl;
 				continue;
 			}
-			cout << "鸡：" << b-g << "只，兔：" << g << "只。" << endl;
+			cout << (in4-1)*(in3-in1)+in1 << endl;
+			continue;
 		}
-
+		if(in2=='~')//随机数生成。
+		{
+			if(in1!=(int)in1||in3!=(int)in3||in4!=(int)in4||in1<0||in3<0||in4<0||in1>in3)
+			{
+				cout << "输入错误！" << endl;
+				continue;
+			}
+			random(in1,in3,in4);
+			continue;
+		}
+		cin >> in5;
+		if(in2=='j'||in2=='J')//鸡兔同笼。
+		{
+			if(in1!=(int)in1||in3!=(int)in3||in4!=(int)in4||in5!=(int)in5||in1<0||in3<0||in4<0||in5<0||in4>in5)
+			{
+				cout << "输入错误！" << endl;
+				continue;
+			}
+			g=(in3-in1*in4)/(in5-in4);
+			cout << "鸡：" << in1-g << "只，兔：" << g << "只。" << endl;
+		}
 	}
 }
