@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdlib>
-#include <cmath>xxx
+#include <cmath>
 #include <ctime>
 using namespace std;
 string s;
